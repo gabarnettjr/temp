@@ -1,0 +1,4 @@
+clc,clear
+
+n = 5;
+[x,y] = meshgrid(linspace(0,1,n));
