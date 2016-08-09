@@ -8,6 +8,8 @@ n = 52;
 h = 1/(n-2);
 [xx,yy] = meshgrid( -h/2 : h : 1+h/2 );
 x = xx(:);  y = yy(:);
+ind = x>0 & x<1 & y>0 & y<1;
+xi = x(ind);  yi = y(ind);
 [xV,yV] = meshgrid( 0:h:1, h/2:h:1-h/2 );
 xV = xV(:);  yV = yV(:);
 [xH,yH] = meshgrid( h/2:h:1-h/2, 0:h:1 );
@@ -15,6 +17,18 @@ xH = xH(:);  yH = yH(:);
 
 idxV = knnsearch( [x,y], [xV,yV], 'k', stencilSize );
 idxH = knnsearch( [x,y], [xH,yH], 'k', stencilSize );
+
+WV = quadMatrix( phi, poly, x, y, idxV, xV, yV, 1 );
+WH = quadMatrix( phi, poly, x, y, idxH, xH, yH, 0 );
+
+indL = 1 : (n-2)^2;
+indR = n-2+1 : (n-2)*(n-1);
+indB = [];
+indT = [];
+for i = 1 : n-2
+  indB = [ indB; (i-1)*(n-1)+(1:n-2)' ];
+  indT = [ indT; (i-1)*(n-1)+(2:n-1)' ];
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -29,7 +43,7 @@ for i = 1 : size(X,1)
   if vert == 1
     b = [ h^4*[2/3,1/6,2/3,2/3,1/6,2/3], [h,0,0] ];
   else
-    b = [ h^4*[2/3,1/6,2/3,2/3,1/6,2/3], [h,0,0] ];
+    b = [ h^4*[2/3,2/3,1/6,1/6,2/3,2/3], [h,0,0] ];
   end
   w = b / A;
   W(:,i) = w(1:size(X,2));
@@ -40,5 +54,7 @@ W = sparse( ii, jj, W, size(X,1), length(xe), size(X,2)*length(xe) );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function z = poly( x, y )
-z = [ ones(length(x),1), x, y ];
+function z = odefun( t, psi, u, v, x, y, indL, indR, indB, indT )
+psiU = psi .* u(x,y,t);
+psiV = psi .* v(x,y,t);
+z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
