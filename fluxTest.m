@@ -3,8 +3,8 @@ function fluxTest
 stencilSize = 6;                                        % number of nodes to use per flux integral calculation
 phi = @(x,y)  (x.^2+y.^2) .^ (3/2);                     % RBF which will be shifted to create RBF part of basis
 poly = @(x,y) [ ones(1,length(x)); x; y ];              % polynomial basis functions
-
 n = 52;                                                 % total number of cells going across the domain, including 2 ghost cells
+
 h = 1/(n-2);                                            % width and height of one cell
 [xx,yy] = meshgrid( -h/2 : h : 1+h/2 );                 % location of cell-averaged values in mesh form
 x = xx(:);  y = yy(:);                                  % location of cell-averaged values in vector form
