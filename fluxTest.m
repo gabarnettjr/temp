@@ -48,6 +48,7 @@ WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total f
 
 U = @(t) u(x,y,t);  V = @(t) v(x,y,t);
 f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
+
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f, 4 );
     if abs( round(t(i)*100) - t(i)*100 ) <= eps && mod( round(t(i)*100), 5) == 0
