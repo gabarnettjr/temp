@@ -62,3 +62,5 @@ psi(:,[1,end]) = psi(:,[2,end-1]);
 psi = psi(:);
 % z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
 z = WVlr*(psi.*u(x,y,t)) + WHbt*(psi.*v(x,y,t));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
