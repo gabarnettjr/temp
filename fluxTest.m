@@ -50,7 +50,7 @@ U = @(t) u(x,y,t);  V = @(t) v(x,y,t);
 f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
 
 for i = 1 : length(t)-1
-    psi = rk( t(i), psi, k, f, 4 );
+    psi = rk( t(i), psi, k, f );
     if abs( round(t(i)*100) - t(i)*100 ) <= eps && mod( round(t(i)*100), 5) == 0
         psi = reshape( psi, n, n );
         figure(1),clf
@@ -114,6 +114,16 @@ r = sqrt( (x-.5).^2 + (y-.5).^2 );
 th = atan2( y-.5, x-.5 );
 uth = 4*pi*r./T .* ( 1 - cos(2*pi*t./T) .* (1-(4*r).^6)./(1+(4*r).^6) );
 z = -uth .* cos(th);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function u = rk( t, u, k, f )
+
+q1 = f( t      , u          );
+q2 = f( t+  k/3, u+  k/3*q1 );
+q2 = f( t+2*k/3, u+2*k/3*q2 );
+
+u = u + k/4 * ( q1 + 3*q2 );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
