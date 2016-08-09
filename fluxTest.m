@@ -51,13 +51,14 @@ f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
 
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f );
-    if abs( round(t(i)*100) - t(i)*100 ) <= eps && mod( round(t(i)*100), 5) == 0
+    if abs( round(t(i+1)*100) - t(i+1)*100 ) <= eps && mod( round(t(i+1)*100), 5) == 0
         psi = reshape( psi, n, n );
         figure(1),clf
             contour( xx, yy, psi, -.05:.1:.95 )
             axis( 'equal', [0,1,0,1] )
             caxis( [-.1,1] )
             colorbar( parula(10) )
+            title(sprintf('t=%g, min=%g, max=%g',t(i+1),min(min(psi)),max(max(psi))))
         drawnow
         psi = psi(:);
     end
