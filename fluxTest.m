@@ -10,9 +10,9 @@ h = 1/(n-2);                                            % width and height of on
 [xx,yy] = meshgrid( -h/2 : h : 1+h/2 );                 % location of cell-averaged values in mesh form
 x = xx(:);  y = yy(:);                                  % location of cell-averaged values in vector form
 [xV,yV] = meshgrid( 0:h:1, h/2:h:1-h/2 );
-xV = xV(:);  yV = yV(:);                                % location of vertical cell walls
+xV = xV(:);  yV = yV(:);                                % location of vertical cell walls (midpoint)
 [xH,yH] = meshgrid( h/2:h:1-h/2, 0:h:1 );
-xH = xH(:);  yH = yH(:);                                % location of horizontal cell walls
+xH = xH(:);  yH = yH(:);                                % location of horizontal cell walls (midpoint)
 
 idxV = knnsearch( [x,y], [xV,yV], 'k', stencilSize );   % index of nearest cell-average neighbors to each vertical wall
 idxH = knnsearch( [x,y], [xH,yH], 'k', stencilSize );   % index of nearest cell-average neighbors to each horizontal wall
