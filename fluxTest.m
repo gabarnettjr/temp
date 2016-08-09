@@ -33,7 +33,7 @@ end
 WVlr = WV(indL,:) - WV(indR,:);                         % combine to get total flux through left and right walls
 WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total flux through bottom and top walls
 
-f = @(t,psi)  odefun( t, psi, @(t)u(x,y,t), @(t)v(x,y,t), x, y, WVlr, WHbt );
+f = @(t,psi)  odefun( t, psi, @(t)u(x,y,t), @(t)v(x,y,t), WVlr, WHbt );
 
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f, 4 );
@@ -45,15 +45,18 @@ for i = 1 : length(t)-1
             colorbar(parula(11))
             caxis([0,1])
         drawnow
+        psi = psi(:);
     end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function W = quadMatrix( phi, poly, x, y, idx, xe, ye, vert )
+stencilSize = size(X,2);
+ne = length(xe);
 X = x(idx);  Y = y(idx);
-W = zeros( size(X,2), length(xe) );
-for i = 1 : length(xe)
+W = zeros( stencilSize, ne );
+for i = 1 : ne
     xn = X(i,:) - xe(i);  yn = Y(i,:) - ye(i);
     xx = meshgrid(xn);  yy = meshgrid(yn);
     P = poly(xn,yn);
@@ -64,14 +67,16 @@ for i = 1 : length(xe)
         b = [ h^4*[2/3,2/3,1/6,1/6,2/3,2/3], [h,0,0] ];
     end
     w = b / A;
-    W(:,i) = w( 1 : size(X,2) );
+    W(:,i) = w( 1 : stencilSize );
 end
-ii = repmat( 1:length(xe), size(X,2), 1 );
-W = sparse( ii, idx.', W, length(xe), length(x), size(X,2)*length(xe) );
+ii = repmat( 1:ne, stencilSize, 1 );
+W = sparse( ii, idx.', W, ne, length(x), stencilSize*ne );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function z = odefun( t, psi, U, V, x, y, WVlr, WHbt )
+% U and V should be functions of t only.
+
+function z = odefun( t, psi, U, V, WVlr, WHbt )
 psi = reshape( psi, sqrt(length(psi)), sqrt(length(psi)) );
 psi([1,end],:) = psi([2,end-1],:);
 psi(:,[1,end]) = psi(:,[2,end-1]);
