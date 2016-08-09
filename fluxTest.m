@@ -55,5 +55,9 @@ W = sparse( ii, idx.', W, size(X,1), length(xe), size(X,2)*length(xe) );
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function z = odefun( t, psi, u, v, x, y, WVlr, WHbt )
+psi = reshape( psi, sqrt(length(psi)), sqrt(length(psi)) );
+psi([1,end],:) = psi([2,end-1],:);
+psi(:,[1,end]) = psi(:,[2,end-1]);
+psi = psi(:);
 % z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
 z = WVlr*(psi.*u(x,y,t)) + WHbt*(psi.*v(x,y,t));
