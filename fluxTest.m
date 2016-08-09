@@ -35,8 +35,8 @@ WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total f
 
 function W = quadMatrix( phi, poly, x, y, idx, xe, ye, vert )
 X = x(idx);  Y = y(idx);
-W = zeros( size(X,2), size(X,1) );
-for i = 1 : size(X,1)
+W = zeros( size(X,2), length(xe) );
+for i = 1 : length(xe)
     xn = X(i,:) - xe(i);  yn = Y(i,:) - ye(i);
     xx = meshgrid(xn);  yy = meshgrid(yn);
     P = poly(xn,yn);
@@ -49,8 +49,8 @@ for i = 1 : size(X,1)
     w = b / A;
     W(:,i) = w( 1 : size(X,2) );
 end
-ii = repmat( 1:size(X,1), size(X,2), 1 );
-W = sparse( ii, idx.', W, size(X,1), length(xe), size(X,2)*length(xe) );
+ii = repmat( 1:length(xe), size(X,2), 1 );
+W = sparse( ii, idx.', W, length(xe), length(x), size(X,2)*length(xe) );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
