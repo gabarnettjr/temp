@@ -1,5 +1,8 @@
 clc,clear
 
+stencilSize = 6;
+phi = @(x,y) (x.^2+y.^2).^(3/2);
+
 n = 5;
 h = 1/(n-2);
 [xx,yy] = meshgrid( -h/2 : h : 1+h/2 );
