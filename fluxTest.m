@@ -1,5 +1,5 @@
 % Conservative transport scheme using PHS RBFs and polynomials for integration across cell walls.
-% The test problem is the deforming C^1 bubble from Blossey and Durran (2008)
+% The test problem is the deforming bubble from Blossey and Durran (2008)
 % Greg Barnett
 % August 9th, 2016
 
