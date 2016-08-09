@@ -42,12 +42,15 @@ end
 WVlr = WV(indL,:) - WV(indR,:);                         % combine to get total flux through left and right walls
 WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total flux through bottom and top walls
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Main loop where psi is stepped forward in time, and hopefully conserved
+
 U = @(t) u(x,y,t);  V = @(t) v(x,y,t);
 f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
-
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f, 4 );
-    if mod( t(i)*100, 5) == 0
+    if mod( t(i)*100, 5) <= eps
         psi = reshape( psi, n, n );
         figure(1),clf
             contour( xx, yy, psi, -.05:.1:.95 )
@@ -62,8 +65,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function W = quadMatrix( phi, poly, h, x, y, idx, xe, ye, vert )
-stencilSize = size(idx,2);
-ne = length(xe);
+stencilSize = size(idx,2);  ne = length(xe);
 X = x(idx);  Y = y(idx);
 W = zeros( stencilSize, ne );
 for i = 1 : ne
@@ -92,7 +94,7 @@ psi([1,end],:) = psi([2,end-1],:);
 psi(:,[1,end]) = psi(:,[2,end-1]);
 psi = psi(:);
 % z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
-z = WVlr*(psi.*U(t)) + WHbt*(psi.*V(t));
+z = WVlr*(psi.*U) + WHbt*(psi.*V);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
