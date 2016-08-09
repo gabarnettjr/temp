@@ -18,8 +18,8 @@ xH = xH(:);  yH = yH(:);                                % location of horizontal
 idxV = knnsearch( [x,y], [xV,yV], 'k', stencilSize );   % index of nearest cell-average neighbors to each vertical wall
 idxH = knnsearch( [x,y], [xH,yH], 'k', stencilSize );   % index of nearest cell-average neighbors to each horizontal wall
 
-WV = quadMatrix( phi, poly, x, y, idxV, xV, yV, 1 );    % sparse matrix of quadrature weights along vertical cell walls
-WH = quadMatrix( phi, poly, x, y, idxH, xH, yH, 0 );    % sparse matrix of quadrature weights along horizontal cell walls
+WV = quadMatrix( phi, poly, h, x, y, idxV, xV, yV, 1 ); % sparse matrix of quadrature weights along vertical cell walls
+WH = quadMatrix( phi, poly, h, x, y, idxH, xH, yH, 0 ); % sparse matrix of quadrature weights along horizontal cell walls
 
 indL = 1 : (n-2)^2;                                     % index for left wall of each interior cell
 indR = n-2+1 : (n-2)*(n-1);                             % index for right wall of each interior cell
@@ -51,8 +51,8 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function W = quadMatrix( phi, poly, x, y, idx, xe, ye, vert )
-stencilSize = size(X,2);
+function W = quadMatrix( phi, poly, h, x, y, idx, xe, ye, vert )
+stencilSize = size(idx,2);
 ne = length(xe);
 X = x(idx);  Y = y(idx);
 W = zeros( stencilSize, ne );
