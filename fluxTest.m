@@ -50,7 +50,7 @@ U = @(t) u(x,y,t);  V = @(t) v(x,y,t);
 f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f, 4 );
-    if mod( t(i)*100, 5) <= eps
+    if abs( round(t(i)*100) - t(i)*100 ) <= eps && mod( round(t(i)*100), 5) == 0
         psi = reshape( psi, n, n );
         figure(1),clf
             contour( xx, yy, psi, -.05:.1:.95 )
