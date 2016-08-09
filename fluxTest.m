@@ -9,7 +9,7 @@ stencilSize = 6;                                        % number of nodes to use
 phi = @(x,y)  (x.^2+y.^2) .^ (3/2);                     % RBF which will be shifted to create RBF part of basis
 poly = @(x,y) [ ones(1,length(x)); x; y ];              % polynomial basis functions
 n = 52;                                                 % total number of cells going across the domain, including 2 ghost cells
-t = 0 : 1/200 : 1;                                      % vector of time values
+t = 0 : 1/400 : 1;                                      % vector of time values
 
 h = 1/(n-2);                                            % width and height of one cell (space step)
 k = t(2) - t(1);                                        % time elapsed during one time step
