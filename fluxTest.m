@@ -8,8 +8,8 @@ t = 0 : 1/200 : 1;                                      % vector of time values
 
 h = 1/(n-2);                                            % width and height of one cell (space step)
 k = t(2) - t(1);                                        % time elapsed during one time step
-[xx,yy] = meshgrid( -h/2 : h : 1+h/2 );                 % location of cell-averaged values in mesh form
-x = xx(:);  y = yy(:);                                  % location of cell-averaged values in vector form
+[xx,yy] = meshgrid( -h/2 : h : 1+h/2 );
+x = xx(:);  y = yy(:);                                  % location of cell-averaged values
 [xV,yV] = meshgrid( 0:h:1, h/2:h:1-h/2 );
 xV = xV(:);  yV = yV(:);                                % location of vertical cell walls (midpoint)
 [xH,yH] = meshgrid( h/2:h:1-h/2, 0:h:1 );
@@ -42,8 +42,8 @@ for i = 1 : length(t)-1
         figure(1),clf
             contour( xx, yy, psi, 11 )
             axis('equal',[0,1,0,1])
+            caxis([-.1,1])
             colorbar(parula(11))
-            caxis([0,1])
         drawnow
         psi = psi(:);
     end
@@ -85,3 +85,25 @@ psi = psi(:);
 z = WVlr*(psi.*U(t)) + WHbt*(psi.*V(t));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
