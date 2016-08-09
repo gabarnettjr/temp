@@ -1,8 +1,8 @@
 function fluxTest
 
-stencilSize = 6;
-phi = @(x,y)  (x.^2+y.^2) .^ (3/2);
-poly = @(x,y) [ ones(length(x),1), x, y ];
+stencilSize = 6;                                        % number of nodes to use per flux integral calculation
+phi = @(x,y)  (x.^2+y.^2) .^ (3/2);                     % RBF which will be shifted to create RBF part of basis
+poly = @(x,y) [ ones(1,length(x)); x; y ];              % polynomial basis functions
 
 n = 52;                                                 % total number of cells going across the domain
 h = 1/(n-2);                                            % width and height of one cell
@@ -19,17 +19,17 @@ idxH = knnsearch( [x,y], [xH,yH], 'k', stencilSize );   % index of nearest cell-
 WV = quadMatrix( phi, poly, x, y, idxV, xV, yV, 1 );    % sparse matrix of quadrature weights along vertical cell walls
 WH = quadMatrix( phi, poly, x, y, idxH, xH, yH, 0 );    % sparse matrix of quadrature weights along horizontal cell walls
 
-indL = 1 : (n-2)^2;
-indR = n-2+1 : (n-2)*(n-1);
+indL = 1 : (n-2)^2;                                     % index for left wall of each interior cell
+indR = n-2+1 : (n-2)*(n-1);                             % index for right wall of each interior cell
 indB = [];
 indT = [];
 for i = 1 : n-2
-    indB = [ indB, (i-1)*(n-1)+(1:n-2) ];
-    indT = [ indT, (i-1)*(n-1)+(2:n-1) ];
+    indB = [ indB, (i-1)*(n-1)+(1:n-2) ];               % index for bottom wall of each interior cell
+    indT = [ indT, (i-1)*(n-1)+(2:n-1) ];               % index for top wall of each interior cell
 end
 
-WVlr = WV(indL,:) - WV(indR,:);
-WHbt = WH(indB,:) - WH(indT,:);
+WVlr = WV(indL,:) - WV(indR,:);                         % combine to get total flux through left and right walls
+WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total flux through bottom and top walls
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,7 +40,7 @@ for i = 1 : size(X,1)
     xn = X(i,:) - xe(i);  yn = Y(i,:) - ye(i);
     xx = meshgrid(xn);  yy = meshgrid(yn);
     P = poly(xn,yn);
-    A = [ phi(xx.'-xx,yy.'-yy), P;  P.', zeros(size(P,2),size(P,2)) ];
+    A = [ phi(xx.'-xx,yy.'-yy), P.';  P, zeros(size(P,1),size(P,1)) ];
     if vert == 1
         b = [ h^4*[2/3,1/6,2/3,2/3,1/6,2/3], [h,0,0] ];
     else
@@ -50,8 +50,7 @@ for i = 1 : size(X,1)
     W(:,i) = w( 1 : size(X,2) );
 end
 ii = repmat( 1:size(X,1), size(X,2), 1 );
-jj = idx.';
-W = sparse( ii, jj, W, size(X,1), length(xe), size(X,2)*length(xe) );
+W = sparse( ii, idx.', W, size(X,1), length(xe), size(X,2)*length(xe) );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
