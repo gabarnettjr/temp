@@ -33,8 +33,19 @@ end
 WVlr = WV(indL,:) - WV(indR,:);                         % combine to get total flux through left and right walls
 WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total flux through bottom and top walls
 
+f = @(t,psi)  odefun( t, psi, @(t)u(x,y,t), @(t)v(x,y,t), x, y, WVlr, WHbt );
+
 for i = 1 : length(t)-1
-    psi = rk( t, psi, f, 
+    psi = rk( t(i), psi, k, f, 4 );
+    if mod( i, 10 ) == 0
+        psi = reshape( psi, sqrt(length(psi)), sqrt(length(psi)) );
+        figure(1),clf
+            contour( xx, yy, psi, 11 )
+            axis('equal',[0,1,0,1])
+            colorbar(parula(11))
+            caxis([0,1])
+        drawnow
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,12 +71,12 @@ W = sparse( ii, idx.', W, length(xe), length(x), size(X,2)*length(xe) );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function z = odefun( t, psi, u, v, x, y, WVlr, WHbt )
+function z = odefun( t, psi, U, V, x, y, WVlr, WHbt )
 psi = reshape( psi, sqrt(length(psi)), sqrt(length(psi)) );
 psi([1,end],:) = psi([2,end-1],:);
 psi(:,[1,end]) = psi(:,[2,end-1]);
 psi = psi(:);
 % z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
-z = WVlr*(psi.*u(x,y,t)) + WHbt*(psi.*v(x,y,t));
+z = WVlr*(psi.*U(t)) + WHbt*(psi.*V(t));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
