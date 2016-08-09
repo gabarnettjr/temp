@@ -5,7 +5,7 @@
 
 function fluxTest
 
-stencilSize = 6;                                        % number of nodes to use per flux integral calculation
+stencilSize = 6;                                        % number of nodes to use per flux integral calculation (don't change this yet)
 phi = @(x,y)  (x.^2+y.^2) .^ (3/2);                     % RBF which will be shifted to create RBF part of basis
 poly = @(x,y) [ ones(1,length(x)); x; y ];              % polynomial basis functions
 n = 52;                                                 % total number of cells going across the domain, including 2 ghost cells
@@ -14,6 +14,10 @@ t = 0 : 1/200 : 1;                                      % vector of time values
 h = 1/(n-2);                                            % width and height of one cell (space step)
 k = t(2) - t(1);                                        % time elapsed during one time step
 [xx,yy] = meshgrid( -h/2 : h : 1+h/2 );
+rtilde = 5 * sqrt( (xx-.3).^2 + (yy-.5).^2 );
+psi = ( (1+cos(pi*rtilde)) ./ 2 ) .^ 2;                 % initial condition for scalar field psi
+psi(rtilde>1) = 0;
+
 x = xx(:);  y = yy(:);                                  % location of cell-averaged values
 [xV,yV] = meshgrid( 0:h:1, h/2:h:1-h/2 );
 xV = xV(:);  yV = yV(:);                                % location of vertical cell walls (midpoint)
@@ -89,6 +93,24 @@ psi(:,[1,end]) = psi(:,[2,end-1]);
 psi = psi(:);
 % z = WV(indL,:)*psiU - WV(indR,:)*psiU + WH(indB,:)*psiV - WH(indT,:)*psiV;
 z = WVlr*(psi.*U(t)) + WHbt*(psi.*V(t));
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function z = u(x,y,t)
+T = 1;
+r = sqrt( (x-.5).^2 + (y-.5).^2 );
+th = atan2( y-.5, x-.5 );
+uth = 4*pi*r./T .* ( 1 - cos(2*pi*t./T) .* (1-(4*r).^6)./(1+(4*r).^6) );
+z = uth .* sin(th);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function z = v(x,y,t)
+T = 1;
+r = sqrt( (x-.5).^2 + (y-.5).^2 );
+th = atan2( y-.5, x-.5 );
+uth = 4*pi*r./T .* ( 1 - cos(2*pi*t./T) .* (1-(4*r).^6)./(1+(4*r).^6) );
+z = -uth .* cos(th);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
