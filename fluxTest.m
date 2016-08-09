@@ -1,3 +1,8 @@
+% Conservative transport scheme using PHS RBFs and polynomials for integration across cell walls.
+% The test problem is the deforming C^1 bubble from Blossey and Durran (2008)
+% Greg Barnett
+% August 9th, 2016
+
 function fluxTest
 
 stencilSize = 6;                                        % number of nodes to use per flux integral calculation
@@ -33,17 +38,18 @@ end
 WVlr = WV(indL,:) - WV(indR,:);                         % combine to get total flux through left and right walls
 WHbt = WH(indB,:) - WH(indT,:);                         % combine to get total flux through bottom and top walls
 
-f = @(t,psi)  odefun( t, psi, @(t)u(x,y,t), @(t)v(x,y,t), WVlr, WHbt );
+U = @(t) u(x,y,t);  V = @(t) v(x,y,t);
+f = @(t,psi)  odefun( t, psi, U(t), V(t), WVlr, WHbt );
 
 for i = 1 : length(t)-1
     psi = rk( t(i), psi, k, f, 4 );
-    if mod( i, 10 ) == 0
-        psi = reshape( psi, sqrt(length(psi)), sqrt(length(psi)) );
+    if mod( t(i)*100, 5) == 0
+        psi = reshape( psi, n, n );
         figure(1),clf
-            contour( xx, yy, psi, 11 )
-            axis('equal',[0,1,0,1])
-            caxis([-.1,1])
-            colorbar(parula(11))
+            contour( xx, yy, psi, -.05:.1:.95 )
+            axis( 'equal', [0,1,0,1] )
+            caxis( [-.1,1] )
+            colorbar( parula(10) )
         drawnow
         psi = psi(:);
     end
@@ -85,6 +91,11 @@ psi = psi(:);
 z = WVlr*(psi.*U(t)) + WHbt*(psi.*V(t));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
 
 
 
